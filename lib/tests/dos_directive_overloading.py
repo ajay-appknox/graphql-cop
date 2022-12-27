@@ -10,12 +10,14 @@ def directive_overloading(url, proxy, headers):
     'description':'Multiple duplicated directives allowed in a query',
     'impact':'Denial of Service - /' + url.rsplit('/', 1)[-1],
     'severity':'HIGH',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   q = 'query cop { __typename @aa@aa@aa@aa@aa@aa@aa@aa@aa@aa }'
   gql_response = graph_query(url, proxies=proxy, headers=headers, payload=q)
   res['curl_verify'] = curlify(gql_response)
+  res['response'] = gql_response
 
   try:
     if len(gql_response.json()['errors']) == 10:

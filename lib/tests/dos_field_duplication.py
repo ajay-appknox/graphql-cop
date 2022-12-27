@@ -10,13 +10,15 @@ def field_duplication(url, proxy, headers):
     'description':'Queries are allowed with 500 of the same repeated field',
     'impact':'Denial of Service - /' + url.rsplit('/', 1)[-1],
     'severity':'HIGH',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   duplicated_string = '__typename \n' * 500
   q = 'query cop { ' + duplicated_string + '} '
   gql_response = graph_query(url, proxies=proxy, headers=headers, payload=q)
   res['curl_verify'] = curlify(gql_response)
+  res['response'] = gql_response
 
   try:
     if gql_response.json()['data']['__typename']:

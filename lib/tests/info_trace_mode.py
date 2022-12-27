@@ -10,7 +10,8 @@ def trace_mode(url, proxy, headers):
     'description':'Tracing is Enabled',
     'impact':'Information Leakage - /' + url.rsplit('/', 1)[-1],
     'severity':'INFO',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   q = 'query cop { __typename }'
@@ -18,6 +19,7 @@ def trace_mode(url, proxy, headers):
   try:
     gql_response = graph_query(url, proxies=proxy, headers=headers, payload=q)
     res['curl_verify'] = curlify(gql_response)
+    res['response'] = gql_response
     if gql_response.json()['errors'][0]['extensions']['tracing']:
       res['result'] = True
     elif '\'extensions\': {\'tracing\':' in str(gql_response.json()).lower():

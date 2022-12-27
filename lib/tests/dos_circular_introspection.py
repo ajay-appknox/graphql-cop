@@ -9,13 +9,15 @@ def circular_query_introspection(url, proxy, headers):
     'description':'Circular-query using Introspection',
     'impact':'Denial of Service - /' + url.rsplit('/', 1)[-1],
     'severity':'HIGH',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   q = 'query cop { __schema { types { fields { type { fields { type { fields { type { fields { type { name } } } } } } } } } } }'
 
   gql_response = graph_query(url, proxies=proxy, headers=headers, payload=q)
   res['curl_verify'] = curlify(gql_response)
+  res['response'] = gql_response
   try:
     if len(gql_response.json()['data']['__schema']['types']) > 25:
       res['result'] = True

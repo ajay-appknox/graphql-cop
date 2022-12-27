@@ -10,12 +10,14 @@ def field_suggestions(url, proxy, headers):
     'description':'Field Suggestions are Enabled',
     'impact':'Information Leakage - /' + url.rsplit('/', 1)[-1],
     'severity':'LOW',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   q = 'query cop { __schema { directive } }'
   gql_response = graph_query(url, proxies=proxy, headers=headers, payload=q)
   res['curl_verify'] = curlify(gql_response)
+  res['response'] = gql_response
 
   try:
     if 'Did you mean' in get_error(gql_response.json()):

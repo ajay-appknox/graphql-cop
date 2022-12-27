@@ -9,7 +9,8 @@ def detect_graphiql(url, proxy, headers):
     'description':'GraphiQL Explorer/Playground Enabled',
     'impact':'Information Leakage - /' + url.rsplit('/', 1)[-1],
     'severity':'LOW',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   heuristics = ('graphiql.min.css', 'GraphQL Playground', 'GraphiQL', 'graphql-playground')

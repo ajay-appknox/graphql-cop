@@ -1,15 +1,17 @@
 #!/usr/env/python3
-import sys
+import sys, os, re
 
 from json import loads
 from json import dumps
 from optparse import OptionParser
 from version import VERSION
-from config import HEADERS
+from config import HEADERS, SAVE_RESULTS
 from urllib.parse import urlparse
+from requests_toolbelt.utils import dump
 
 from lib.tests.info_field_suggestions import field_suggestions
 from lib.tests.info_introspect import introspection
+from lib.tests.info_introspect_mod import introspection_mod
 from lib.tests.info_graphiql import detect_graphiql
 from lib.tests.info_get_method_support import get_method_support
 from lib.tests.dos_alias_overloading import alias_overloading
@@ -29,7 +31,9 @@ parser.add_option('-H', '--header', dest='header', action='append', help='Append
 parser.add_option('-o', '--output', dest='format',
                         help='json', default=False)
 parser.add_option('-f', '--force', dest='forced_scan', action='store_true',
-                        help='Forces a scan when GraphQL cannot be detected', default=False)                        
+                        help='Forces a scan when GraphQL cannot be detected', default=False)          
+parser.add_option('-s', '--save', dest='save_results', action='store_true',
+                        help='Save output of the scan in report format', default=False)                        
 parser.add_option('--proxy', '-x', dest='proxy', action='store_true', default=False,
                         help='Sends the request through http://127.0.0.1:8080 proxy')
 parser.add_option('--version', '-v', dest='version', action='store_true', default=False,
@@ -41,6 +45,9 @@ options, args = parser.parse_args()
 if options.version:
     print('version:', VERSION)
     sys.exit(0)
+    
+if options.save_results:
+    SAVE_RESULTS = True
 
 if not options.url:
     print(draw_art())
@@ -79,11 +86,11 @@ else:
      for endpoint in endpoints:
         paths.append(parsed.scheme + '://' + parsed.netloc + endpoint)
 
-tests = [field_suggestions, introspection, detect_graphiql,
-         get_method_support, alias_overloading, batch_query,
-         field_duplication, trace_mode, directive_overloading,
-         circular_query_introspection, get_based_mutation, post_based_csrf,
-         unhandled_error_detection]
+tests = [field_suggestions]#field_suggestions, introspection] #, detect_graphiql,
+        #  get_method_support, alias_overloading, batch_query,
+        #  field_duplication, trace_mode, directive_overloading,
+        #  circular_query_introspection, get_based_mutation, post_based_csrf,
+        #  unhandled_error_detection]
 
 json_output = []
 
@@ -104,4 +111,12 @@ if options.format == 'json':
 else:
     for i in json_output:
         if i['result']:
-            print('[{}] {} - {} ({})'.format(i['severity'], i['title'], i['description'], i['impact']))
+            print('[{}] {} - {} ({}) - {}'.format(i['severity'], i['title'], i['description'], i['impact'], len(i['response'].text)))
+            if options.save_results:
+                if not os.path.exists("/tmp/graphql_cop"):
+                    os.mkdir("/tmp/graphql_cop")
+                with open("/tmp/graphql_cop/%s" % i['title'].lower().replace(" ", "_"), "w") as fd:
+                    tmp_res = dump.dump_response(i['response'], request_prefix=b'', response_prefix=b'').decode().replace("CONNECT", "POST")
+                    # tmp_res = re.sub(r'^< |^> ', '', tmp_res, flags=re.MULTILINE)
+                    print(tmp_res)
+                    fd.write(tmp_res)

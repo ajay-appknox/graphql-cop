@@ -10,7 +10,8 @@ def unhandled_error_detection(url, proxy, headers):
     'description':'Exception errors are not handled',
     'impact':'Information Leakage - /' + url.rsplit('/', 1)[-1],
     'severity':'INFO',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   q = 'qwerty cop { abc }'
@@ -18,6 +19,7 @@ def unhandled_error_detection(url, proxy, headers):
   try:
     gql_response = graph_query(url, proxies=proxy, headers=headers, payload=q)
     res['curl_verify'] = curlify(gql_response)
+    res['response'] = gql_response
     if gql_response.json()['errors'][0]['extensions']['exception']:
       res['result'] = True
     elif '\'extensions\': {\'exception\':' in str(gql_response.json()).lower():

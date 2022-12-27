@@ -55,6 +55,7 @@ def graph_query(url, proxies, headers, operation='query', payload={}, batch=Fals
 
 def request(url, proxies, headers, params=None, data=None, verb='GET'):
   """Perform requests."""
+  print("performing requests")
   try:
     response = requests.request(verb,
                             url=url,

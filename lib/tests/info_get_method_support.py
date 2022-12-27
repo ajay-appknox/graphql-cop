@@ -10,7 +10,8 @@ def get_method_support(url, proxies, headers):
     'description':'GraphQL queries allowed using the GET method',
     'impact':'Possible Cross Site Request Forgery (CSRF) - /' + url.rsplit('/', 1)[-1],
     'severity':'MEDIUM',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   q = 'query cop {__typename}'

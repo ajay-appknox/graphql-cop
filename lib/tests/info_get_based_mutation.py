@@ -9,7 +9,8 @@ def get_based_mutation(url, proxies, headers):
     'description':'GraphQL mutations allowed using the GET method',
     'impact':'Possible Cross Site Request Forgery - /' + url.rsplit('/', 1)[-1],
     'severity':'MEDIUM',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
 
   q = 'mutation cop {__typename}'

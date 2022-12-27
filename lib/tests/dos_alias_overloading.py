@@ -10,7 +10,8 @@ def alias_overloading(url, proxy, headers):
     'description':'Alias Overloading with 100+ aliases is allowed',
     'impact':'Denial of Service - /' + url.rsplit('/', 1)[-1],
     'severity':'HIGH',
-    'curl_verify':''
+    'curl_verify':'',
+    'response':''
   }
   aliases = ''
 
@@ -20,6 +21,7 @@ def alias_overloading(url, proxy, headers):
   gql_response = graph_query(url, proxies=proxy, headers=headers, payload='query cop { ' + aliases + ' }')
 
   res['curl_verify'] = curlify(gql_response)
+  res['response'] = gql_response
 
   try:
     if gql_response.json()['data']['alias100']:
